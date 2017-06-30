@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html class="ui-page-login">
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../css/app.css" />
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 id="title" class="mui-title">个人中心</h1>
+		</header>
+		<div class="mui-content">
+			<img src="../images/center.jpg" style="width: 100%;" />
+			<ul class="mui-table-view mui-grid-view mui-grid-9">
+				<li id="personal_btn" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4">
+					<a href="#">
+						<span class="mui-icon mui-icon-contact"></span>
+						<div class="mui-media-body">个人信息</div>
+					</a>
+				</li>
+				<li id="consult_btn" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4">
+					<a href="#">
+						<span class="mui-icon mui-icon-compose"></span>
+						<div class="mui-media-body">我的咨询</div>
+					</a>
+				</li>
+				<li id="topic_btn" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4">
+					<a href="#">
+						<span class="mui-icon mui-icon-chatboxes"></span>
+						<div class="mui-media-body">我发表的话题</div>
+					</a>
+				</li>
+				<li id="participation_btn" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4">
+					<a href="#">
+						<span class="mui-icon mui-icon-chat"></span>
+						<div class="mui-media-body">我参与的话题</div>
+					</a>
+				</li>
+				<li id="record_li" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4">
+					<a href="#">
+						<span class="mui-icon mui-icon-info"></span>
+						<div class="mui-media-body">我的学习记录</div>
+					</a>
+				</li>
+				<li id="update_psw_li" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4">
+					<a href="#">
+						<span class="mui-icon mui-icon-locked"></span>
+						<div class="mui-media-body">密码修改</div>
+					</a>
+				</li>
+			</ul>
+		</div>
+		<div style="bottom: 0; position: fixed;padding-bottom: 5px;margin-bottom: 0px; left:10px;right:10px;margin-left:auto;margin-right:auto; background: #F7F7F7;">
+			<button id="btn_logout" class="mui-btn  mui-btn-block" style="width: 100%" type="button">退出登录</button>
+		</div>
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/config.js"></script>
+		<script>
+			//mui初始化
+			mui.init({
+					statusBarBackground: '#ACC659'
+				});
+			mui.plusReady(function() {
+				document.getElementById("personal_btn").addEventListener("tap", function() {
+					mui.openWindow({
+						url: 'personal.html',
+						id: 'personal',
+						show: {
+							aniShow: 'pop-in'
+						},
+						styles: {
+							popGesture: 'hide'
+						},
+						waiting: {
+							autoShow: true
+						}
+					});
+				});
+				document.getElementById("record_li").addEventListener("tap", function() {
+					mui.openWindow({
+						url: 'Record/index.html',
+						id: 'record_personal_index',
+						show: {
+							aniShow: 'pop-in'
+						},
+						styles: {
+							popGesture: 'hide'
+						},
+						waiting: {
+							autoShow: true
+						}
+					});
+				});
+				
+				document.getElementById("update_psw_li").addEventListener("tap", function() {
+					mui.openWindow({
+						url: 'update_psw.html',
+						id: 'update_psw',
+						show: {
+							aniShow: 'pop-in'
+						},
+						styles: {
+							popGesture: 'hide'
+						},
+						waiting: {
+							autoShow: true
+						}
+					});
+				});
+				
+				document.getElementById("participation_btn").addEventListener("tap", function() {
+					mui.openWindow({
+						url: 'Participation/index.html',
+						id: 'participation_personal_index',
+						show: {
+							aniShow: 'pop-in'
+						},
+						styles: {
+							popGesture: 'hide'
+						},
+						waiting: {
+							autoShow: true
+						}
+					});
+				});
+				document.getElementById("consult_btn").addEventListener("tap", function() {
+					mui.openWindow({
+						url: 'Consult/index.html',
+						id: 'consult_personal_index',
+						show: {
+							aniShow: 'pop-in'
+						},
+						styles: {
+							popGesture: 'hide'
+						},
+						waiting: {
+							autoShow: true
+						}
+					});
+				});
+				document.getElementById("topic_btn").addEventListener("tap", function() {
+					mui.openWindow({
+						url: 'Topic/index.html',
+						id: 'topic_personal_index',
+						show: {
+							aniShow: 'pop-in'
+						},
+						styles: {
+							popGesture: 'hide'
+						},
+						waiting: {
+							autoShow: true
+						}
+					});
+				});
+				document.getElementById("btn_logout").addEventListener("tap", function() {
+					plus.nativeUI.confirm("您确定要退出吗?", function(e) {
+						if (e.index == 0) {
+							localStorage.removeItem("student");
+							plus.webview.currentWebview().close();
+						}
+					}, "垫江职教三农服务平台", ["确定", "我点错了"]);
+				});
+			});
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>Hello MUI</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<!--App自定义的css-->
+		<link rel="stylesheet" type="text/css" href="../css/app.css"/>
+		<script src="../js/config.js"></script>
+		<script src="../js/extra/jquery-1.10.1.min.js"></script>
+	</head>
+
+	<body>
+			
+	</body>
+	<script src="../js/mui.min.js"></script>
+	<script src="../js/extra/baidu_template.js"></script>
+	<script id="tmpl" type="text/html">
+	<% for(var i=0;i<rows.length;i++) {%>
+	<div class="title">
+				<span><%=rows[i].typeName%></span>
+				<span class="more" type_name="<%=rows[i].typeName%>" type_code="<%=rows[i].typeCode%>">更多</span> 
+			</div>
+			<ul class="mui-table-view">
+				<%
+					for(var m=0;m<rows[i].items.length;m++){
+				%>
+				<li  class="li_bottom mui-table-view-cell mui-media news_item" news_id="<%=rows[i].items[m].AGRICULTURAL_NEWS_ID%>">
+						<% if(rows[i].items[m].AGRICULTURAL_NEWS_HAS_COVER==1){%>
+						<img class="mui-media-object mui-pull-right" src="<%=server_url+rows[i].items[m].AGRICULTURAL_NEWS_COVER_URL%>">
+						<%}%>
+						<div class="mui-media-body" >
+							<%=rows[i].items[m].AGRICULTURAL_NEWS_TITLE%>
+							<p class='mui-ellipsis'><%=rows[i].items[m].AGRICULTURAL_NEWS_DESC%></p>
+						</div>
+				</li>
+				<%
+					}
+				%>
+				
+			</ul>
+			<%}%>
+	</script>
+	
+	<script>
+		
+		mui.init({
+			swipeBack:true, //启用右滑关闭功能
+			statusBarBackground: '#ACC659'
+		});
+		
+		//mui初始化
+			mui.init({
+					statusBarBackground: '#ACC659'
+				});
+		mui.plusReady(function(){ 
+			
+			mui.ajax(api_url+"/api/mobile/agricultural_news/index",{
+				dataType:'json',//服务器返回json格式数据
+				type:'get',//HTTP请求类型
+				timeout:5000,//超时时间设置为10秒；
+				success:function(data){
+					var tmpl_data ={rows:data}; 
+					var html=baidu.template('tmpl',tmpl_data);
+					document.body.innerHTML=html;
+					plus.nativeUI.closeWaiting();
+				}
+			});
+			
+			mui("body").on("tap",".news_item",function(){
+				var news_id =this.getAttribute("news_id");
+				var type_code = this.getAttribute("type_code");
+				var type_name =this.getAttribute("type_name");
+				
+				mui.openWindow({
+					url: "view.html",
+					id: "view",
+					styles: {
+						top: 0,
+						bottom: 0
+					},
+					extras: {
+						news_id:news_id
+					},
+					createNew: true,
+					show: {
+						autoShow: true,
+						duration: 500
+					},
+					waiting: {
+						autoShow: true,
+						title: '正在加载...'
+					}
+				});
+				
+				
+			});
+			mui("body").on("tap",".more",function(){
+				var type_code = this.getAttribute("type_code");
+				var type_name =this.getAttribute("type_name");
+				var view = plus.webview.create(
+	    				"list.html",
+	    				"list",
+	    				{
+	      					top:"0px",//新页面顶部位置
+	      					bottom:"0px"//新页面底部位置
+	    				},{
+	    					type_code:type_code,
+	    					type_name:type_name
+	    				});
+		    			
+				view.show();
+			});
+			
+		});
+	</script>
+</html>

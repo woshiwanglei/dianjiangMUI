@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>Hello MUI</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="stylesheet" href="../../css/mui.min.css">
+		<link rel="stylesheet" type="text/css" href="../../css/app.css" />
+		<style type="text/css">
+			.mui-media-object {
+				max-height: 180px;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<!--下拉刷新容器-->
+		<div id="pullrefresh" class="mui-content mui-scroll-wrapper">
+			<div class="mui-scroll">
+				<ul class="mui-table-view">
+					<li class="mui-table-view-cell">
+						<div class="mui-table">
+							<div class="mui-table-cell mui-col-xs-9">
+								<input id="key" type="text" class="mui-input-clear mui-input" placeholder="请输入关键字" style="margin-bottom:0px">
+							</div>
+							<div class="mui-table-cell mui-col-xs-3" style="vertical-align: middle;padding-left: 8px;font: 16px;">
+								<button id='query' class="mui-btn  mui-icon mui-icon-search">查询</button>
+							</div>
+						</div>
+					</li>
+				</ul>
+				<!--数据列表-->
+				<ul id="list" class="mui-table-view mui-table-view-striped mui-table-view-condensed">
+				</ul>
+			</div>
+		</div>
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/config.js"></script>
+		<script src="../../js/extra/baidu_template.js"></script>
+		<script id="tmpl" type="text/html">
+
+			<% for(var n=0;n<content.length;n++){
+			   		var _course = content[n];
+				%>
+				<li class="mui-table-view-cell courseware" courseware_id="<%=_course.COURSEWARE_RESOURCE_ID%>">
+					<div class="mui-table">
+						<div class="mui-table-cell mui-col-xs-12">
+							<p class="mui-ellipsis mui-h4">【
+								<%=_course.EDU_RESOURCE_NAME%>】
+									<%=_course.COURSEWARE_RESOURCE_TITLE%>
+							</p>
+							<p class="mui-h6 mui-ellipsis" style="text-align: right;">
+								<%=_course.USER_NAME%>
+									<%=_course.COURSEWARE_RESOURCE_DATETIME%>
+							</p>
+						</div>
+					</div>
+				</li>
+				<%}%>
+
+		</script>
+		<script>
+			var page = 1;
+			var rows = 12;
+			mui.plusReady(function() {
+				document.getElementById("query").addEventListener("tap", function() {
+					pulldownRefresh();
+				});
+				var GetData = function(page, rows, success) {
+					var url = api_url + "/api/mobile/resouces/courseware/list";
+					var key = document.getElementById("key").value;
+					url += "?page=" + page;
+					url += "&rows=" + rows;
+					url += "&key=" + encodeURIComponent(encodeURIComponent(key));
+					mui.ajax(url, {
+						beforeSend: function() {
+							plus.nativeUI.showWaiting("请稍后...");
+						},
+						dataType: 'json', //服务器返回json格式数据
+						type: 'get', //HTTP请求类型
+						timeout: 5000, //超时时间设置为10秒；
+						success: function(data) {
+							success(data);
+						},
+						complete: function() {
+							window.setTimeout(function() {
+								plus.nativeUI.closeWaiting();
+							}, 500);
+						}
+					});
+				}
+				document.addEventListener("plusscrollbottom", function() {
+					pullupRefresh();
+				});
+				mui("body").on("tap", ".courseware", function() {
+					var courseware_id = this.getAttribute("courseware_id");
+					mui.openWindow({
+						url: "view.html",
+						id: "courseware_view",
+						styles: {
+							top: 0,
+							bottom: 0
+						},
+						extras: {
+							courseware_id: courseware_id
+						},
+						createNew: true,
+						show: {
+							autoShow: true,
+							duration: 500
+						},
+						waiting: {
+							autoShow: true,
+							title: '正在加载...'
+						}
+					});
+				});
+				/**
+				 * 下拉刷新具体业务实现
+				 */
+				function pulldownRefresh() {
+					setTimeout(function() {
+						page = 1;
+						GetData(page++, rows, function(data) {
+							var pagination = data.pagination;
+							var content = data.content;
+							var html = baidu.template('tmpl', data);
+							document.getElementById("list").innerHTML = html;
+							mui('#pullrefresh').pullRefresh().endPulldownToRefresh(); //refresh completed
+						});
+					}, 100);
+				}
+				var count = 0;
+				/**
+				 * 上拉加载具体业务实现
+				 */
+				function pullupRefresh() {
+					setTimeout(function() {
+						GetData(page++, rows, function(data) {
+							var pagination = data.pagination;
+							var content = data.content;
+							var html = baidu.template('tmpl', data);
+							document.getElementById("list").innerHTML += html;
+							mui('#pullrefresh').pullRefresh().endPulldownToRefresh(); //refresh completed
+							if (content.length < rows) {
+								mui('#pullrefresh').pullRefresh().endPullupToRefresh(true);
+							}
+						});
+					}, 100);
+				}
+				mui.init({
+					pullRefresh: {
+						container: '#pullrefresh',
+						down: {
+							callback: pulldownRefresh
+						},
+						up: {
+							contentrefresh: '正在加载...',
+							callback: pullupRefresh
+						}
+					}
+				});
+				mui('#pullrefresh').pullRefresh().pulldownLoading();
+			});
+		</script>
+
+	</body>
+
+</html>

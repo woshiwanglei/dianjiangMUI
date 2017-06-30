@@ -1,0 +1,4 @@
+var server_url = "http://218.201.52.93:81";
+var server_context ="";
+var api_url =server_url+server_context;
+

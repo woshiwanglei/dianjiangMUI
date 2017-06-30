@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>Hello MUI</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="../../css/mui.min.css">
+		<link rel='stylesheet prefetch' href='../../css/video-js.css'>
+			<link rel="stylesheet" type="text/css" href="../../css/app.css"/>
+		<style>
+			.video-js {
+				color: #fff;
+				font-size: 10px;
+			}
+			
+			.vjs-default-skin .vjs-big-play-button {
+				border: 0.06666em solid #fff;
+				border-radius: 0.3em;
+				font-size: 3em;
+				height: 1.5em;
+				left: 50%;
+				line-height: 1.5em;
+				margin-left: -1.5em;
+				margin-top: -0.75em;
+				top: 50%;
+				width: 3em;
+			}
+			
+			.video-js .vjs-control-bar,
+			.video-js .vjs-big-play-button,
+			.video-js .vjs-menu-button .vjs-menu-content {
+				background-color: rgba(43, 51, 63, 0.7);
+			}
+			
+			.video-js .vjs-slider {
+				background-color: rgba(115, 133, 159, 0.5);
+			}
+			
+			.video-js .vjs-volume-level,
+			.video-js .vjs-play-progress,
+			.video-js .vjs-slider-bar {
+				background: #fff none repeat scroll 0 0;
+			}
+			
+			.video-js .vjs-load-progress {
+				background: rgba(115, 133, 159, 0.5) none repeat scroll 0 0;
+			}
+			
+			.video-js .vjs-load-progress div {
+				background: rgba(115, 133, 159, 0.75) none repeat scroll 0 0;
+			}
+		</style>
+		<style>
+			.title {
+				margin: 10px;
+				color: #000;
+				font-weight: bold;
+				font-size: 15px;
+			}
+			
+			img {
+				max-width: 90%;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">教学视频</h1>
+		</header>
+
+		<div class="mui-content">
+			<input type="hidden" id="uuid" />
+			<div class="mui-content-padded">
+				<h4 id="title" style="text-align:center"></h4>
+				<div id="time" style="text-align: center;padding: 6px;"></div>
+				<div id="news_content">
+					<video id="video"  class="video-js vjs-default-skin" width="100%" webkit-playsinline controls preload="none" data-setup='{ "aspectRatio":"640:400" }'>
+					</video>
+					<div id="desc" style="padding-top: 10px;">
+						
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script src="../../js/mui.min.js"></script>
+	<script src="../../js/config.js"></script>
+	<script src="../../js/extra/jquery-1.10.1.min.js"></script>
+	<script src="../../js/app.js"></script>
+	<script></script>
+	<script>
+		mui.init({
+			swipeBack: true //启用右滑关闭功能
+		});
+		mui.plusReady(function() {
+			plus.nativeUI.showWaiting("请稍后...", {
+				padding: "20px",
+				round: "10px"
+			});
+			
+			
+			var student = getStudent();
+			
+			var report = function(){
+				var url =api_url+"/api/mobile/student/record?uuid=";
+				url+= document.getElementById("uuid").value;
+				url+="&studentId="+student.studentId;
+				mui.ajax({
+					type : 'POST',
+					dataType : 'json',
+					contentType : 'application/json',
+					url : url
+				});
+			}
+			window.setInterval(function(){
+				report();
+			},10000);
+			
+			////关闭遮罩
+			var self = plus.webview.currentWebview();
+			　
+			var view = plus.ios.currentWebview();　　 // 设置提示对话上的内容，这里的方法名称中必须包含':'字符
+			view.plusSetAttribute("allowsInlineMediaPlayback",true);
+			//plus.ios.invoke(view.InstanceObject.plus, "allowsInlineMediaPlayback", true); // 提示框上其它按钮的文字，设置为null表示不显示
+			　　 // 调用show方法显示提示对话框，在JS中使用()语法调用对象的方法
+			var video_id = self.video_id;
+			var GetData = function() {
+				var url = api_url + "/api/mobile/resouces/video/view?id=" + video_id;
+				mui.getJSON(url, null, function(data) {
+					$("#title").text(data.videoResourceTitle);
+					$("#time").text("发布时间 "+data.videoResourceDateTime);
+					$("#video").attr("poster", server_url + data.videoResourceThumbnailUrl);
+					$("#desc").html(data.videoResourceDesc);
+					$("#uuid").val(data.videoResourceUuid);
+					var _sources = '<source src="' + server_url + data.videoResourceMp4Url + '" type="video/mp4" -webkit-playsinline/>'
+					$("#video").append(_sources);
+					jQuery.getScript("../../js/extra/video.js");
+					window.setTimeout(function() {
+						plus.nativeUI.closeWaiting();
+					}, 500);
+				});
+			}
+			GetData();
+		});
+	</script>
+
+</html>

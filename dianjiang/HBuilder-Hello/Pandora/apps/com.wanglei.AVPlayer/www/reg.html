@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html class="ui-page-login">
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/mui.picker.css" rel="stylesheet" />
+		<link href="css/mui.poppicker.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/app.css" />
+		<style>
+			.ui-page-login,
+			body {
+				width: 100%;
+				height: 100%;
+				margin: 0px;
+				padding: 0px;
+			}
+			
+			.mui-content {
+				height: 100%;
+			}
+			
+			.area {
+				margin: 20px auto 0px auto;
+			}
+			
+			.mui-input-group {
+				margin: 10px;
+				border-radius: 8px;
+			}
+			
+			.mui-input-group:first-child {
+				margin-top: 40px;
+			}
+			
+			.mui-input-group label {
+				width: 30%;
+			}
+			
+			.mui-input-row label~input,
+			.mui-input-row label~select,
+			.mui-input-row label~textarea {
+				width: 70%;
+			}
+			
+			.mui-checkbox input[type=checkbox],
+			.mui-radio input[type=radio] {
+				top: 6px;
+			}
+			
+			.mui-content-padded {
+				margin-top: 25px;
+			}
+			
+			.mui-btn {
+				padding: 10px;
+			}
+			
+			.link-area {
+				display: block;
+				margin-top: 25px;
+				text-align: center;
+			}
+			
+			.spliter {
+				color: #bbb;
+				padding: 0px 8px;
+			}
+		</style>
+
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 id="title" class="mui-title">垫江三农职教服务网</h1>
+		</header>
+		<div class="mui-content">
+			<form id='login-form' class="mui-input-group">
+				<div class="mui-input-row">
+					<label>登录帐号</label>
+					<input id='studentAccount' type="text" class="mui-input-clear mui-input" placeholder="请输入您的登录帐号">
+				</div>
+				<div class="mui-input-row">
+					<label>登录密码</label>
+					<input id='studentPsw' type="password" class="mui-input-clear mui-input" placeholder="请输入密码">
+				</div>
+				<div class="mui-input-row">
+					<label>密码确认</label>
+					<input id='studentPsw2' type="password" class="mui-input-clear mui-input" placeholder="请再次输入密码">
+				</div>
+			</form>
+			<form id='login-form' class="mui-input-group">
+				<div class="mui-input-row">
+					<label>用户姓名</label>
+					<input id='studentName' type="text" class="mui-input-clear mui-input" placeholder="输入您的姓名">
+				</div>
+				<div class="mui-input-row">
+					<label>联系电话</label>
+					<input id='studentTel' maxlength="11" type="number" class="mui-input-clear mui-input" placeholder="输入您的11位手机号码">
+				</div>
+				<div class="mui-input-row">
+					<label>所在村组</label>
+					<input type="hidden" id="studentRegionCode" />
+					<button id='picker' style="padding-left: 0px; font-size: 16px; width: 70%;border: none;text-align: left" type='button'>请选择</button>
+				</div>
+				<div class="mui-input-row">
+					<label>参训时间</label>
+					<input type="hidden" id="studentDatetime" />
+					<button id='picker_date' style="padding-left: 0px; font-size: 16px; width: 70%;border: none;text-align: left"  type='button'>请选择</button>
+				</div>
+				<div class="mui-input-row">
+					<label>工作单位</label>
+					<input maxlength="20" id='studentOrg' type="text" class="mui-input-clear mui-input" placeholder="请输入工作单位">
+				</div>
+				<div class="mui-input-row">
+					<label>经营范围</label>
+					<input maxlength="20" id='studentBizScope' type="text" class="mui-input-clear mui-input" placeholder="请输入经营范围">
+				</div>
+			</form>
+			<div class="mui-content-padded">
+				<button id='btnReg' class="mui-btn mui-btn-block ">注册</button>
+			</div>
+
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script src="js/mui.enterfocus.js"></script>
+		<script src="js/mui.picker.js"></script>
+		<script src="js/mui.poppicker.js"></script>
+		<script src="js/config.js"></script>
+		<script>
+			//mui初始化
+			mui.init({
+					statusBarBackground: '#ACC659'
+				});
+			mui.plusReady(function() {
+				plus.screen.lockOrientation("portrait-primary");
+				var cityPicker = new mui.PopPicker({
+					layer: 2
+				});
+				var GetData = function() {
+					var url = api_url + "/api/city/list";
+					mui.getJSON(url, null, function(data) {
+						cityPicker.setData(data);
+					});
+				};
+				GetData();
+				var btnPicker = document.getElementById('picker');
+				btnPicker.addEventListener('tap', function(event) {
+					cityPicker.show(function(items) {
+						btnPicker.innerText = items[0].text + " " + items[1].text;
+						document.getElementById("studentRegionCode").value = items[1].value;
+					});
+				}, false);
+				document.getElementById("picker_date").addEventListener('tap', function() {
+					var _this = this;
+					var now = new Date();
+					if (_this.getAttribute("year")) {
+						now = new Date(_this.getAttribute("year"), _this.getAttribute("month"), _this.getAttribute("day"));
+					}
+					var minDate = new Date();
+					minDate.setFullYear(2014, 0, 1);
+					var maxDate = new Date();
+					maxDate.setFullYear(2018, 11, 31);
+					plus.nativeUI.pickDate(function(e) {
+						var d = e.date;
+						var studentDatetime = d.getFullYear() + "-" + (d.getMonth() + 1 < 10 ? "0" : "") + (d.getMonth() + 1) + "-" + (d.getDate() + 1 < 10 ? "0" : "") + d.getDate();
+						_this.innerText = studentDatetime;
+						_this.setAttribute("year", d.getFullYear());
+						_this.setAttribute("month", d.getMonth());
+						_this.setAttribute("day", d.getDate());
+						document.getElementById("studentDatetime").value = studentDatetime;
+					}, function(e) {}, {
+						title: "请选择日期",
+						date: now,
+						minDate: minDate,
+						maxDate: maxDate
+					});
+				});
+				var showError = function(msg) {
+					plus.nativeUI.toast(msg, {
+						verticalAlign: "center"
+					});
+				}
+				document.getElementById("btnReg").addEventListener("tap", function() {
+					var studentAccount = document.getElementById("studentAccount").value;
+					var studentPsw = document.getElementById("studentPsw").value;
+					var studentPsw2 = document.getElementById("studentPsw2").value;
+					var studentTel = document.getElementById("studentTel").value;
+					var studentName = document.getElementById("studentName").value;
+					var studentRegionCode = document.getElementById("studentRegionCode").value;
+					var studentDatetime = document.getElementById("studentDatetime").value;
+					var studentOrg = document.getElementById("studentOrg").value;
+					var studentBizScope = document.getElementById("studentBizScope").value;
+					if (studentAccount.trim().length == 0) {
+						showError("登录帐号不能为空");
+						return;
+					}
+					if (studentPsw.trim().length == 0) {
+						showError("登录密码不能为空");
+						return;
+					}
+					if (studentPsw2.trim().length == 0) {
+						showError("确认密码不能为空");
+						return;
+					}
+					if (studentPsw2.trim().length == 0) {
+						showError("确认密码不能为空");
+						return;
+					}
+					if (studentName.trim().length == 0) {
+						showError("用户姓名不能为空");
+						return;
+					}
+					if (studentTel.trim().length == 0) {
+						showError("用户联系方式不能为空");
+						return;
+					}
+					var studentAccount_reg = /^[A-Za-z0-9]{6,16}$/;
+					if (!studentAccount_reg.test(studentAccount)) {
+						showError("帐号格式输入错误\n限6-16位 数字 字母以及下划线");
+						return;
+					}
+					if (studentPsw.length > 16 || studentPsw.length < 6) {
+						showError("密码输入错误\n限6-16位 数字 字母以及下划线");
+						return;
+					}
+					if (studentPsw != studentPsw2) {
+						showError("密码输入错误\n两次输入的密码不一致");
+						return;
+					}
+					var studentTel_reg = /^1\d{10}$/;
+					if (!studentTel_reg.test(studentTel)) {
+						showError("联系电话输入错误\n请输入正确的11位手机号码");
+						return;
+					}
+					var model = {};
+					model.studentAccount = studentAccount;
+					model.studentPsw = studentPsw;
+					model.studentTel = studentTel;
+					model.studentName = studentName;
+					model.studentRegionCode = studentRegionCode;
+					model.studentDatetime = studentDatetime;
+					model.studentOrg = studentOrg;
+					model.studentBizScope = studentBizScope;
+					mui.ajax(api_url + "/api/mobile/student/reg", {
+						beforeSend: function() {
+							plus.nativeUI.showWaiting("处理中,请稍后...");
+						},
+						contentType: "application/json",
+						dataType: 'json',
+						type: 'post',
+						data: JSON.stringify(model),
+						timeout: 5000,
+						success: function(data) {
+							if (data.success) {
+								plus.nativeUI.toast("恭喜您注册成功,请登录", {
+									verticalAlign: "center",
+									duration:3000
+								});
+								window.setTimeout(function(){
+									plus.webview.currentWebview().close();
+								},1500);
+							}else{
+								plus.nativeUI.toast(data.messageContent, {
+									verticalAlign: "center"
+								});
+							}
+						},
+						error: function(err) {
+							console.log(JSON.stringify(arguments));
+						},
+						complete: function() {
+							plus.nativeUI.closeWaiting();
+						}
+					});
+				});
+			});
+		</script>
+	</body>
+
+</html>

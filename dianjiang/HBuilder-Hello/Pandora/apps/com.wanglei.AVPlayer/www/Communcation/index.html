@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>Hello MUI</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<!--App自定义的css-->
+		<link rel="stylesheet" type="text/css" href="../css/app.css" />
+		<script src="../js/config.js"></script>
+		<script src="../js/extra/jquery-1.10.1.min.js"></script>
+	</head>
+
+	<body>
+		<img src="../images/consulation2.png" style="width: 100%;" />
+		<div class="mui-content" id="content">
+
+		</div>
+	</body>
+	<script src="../js/mui.min.js"></script>
+	<script src="../js/extra/baidu_template.js"></script>
+	<script id="tmpl" type="text/html">
+		<div class="title">
+			<span>专家咨询</span>
+			<span class="more expert_consult">更多</span>
+		</div>
+		<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed">
+			<% for(var m=0;m<expertConsults.length;m++){
+			   		var expertConsult = expertConsults[m];
+				%>
+				<li class="mui-table-view-cell">
+					<div class="mui-table">
+						<div class="mui-table-cell mui-col-xs-12">
+							<p class="mui-h4 mui-ellipsis-2">问:
+								<%=expertConsult.EXPERT_CONSULT_CONTENT%>
+							</p>
+							<h5 style="text-align: right;"><%=expertConsult.STUDENT_NAME%>  <%=expertConsult.EXPERT_CONSULT_TIME%></h5>
+
+							<p class="mui-h4">答:
+								<%=expertConsult.EXPERT_CONSULT_REPLY_CONTENT%>
+							</p>
+							<h5 style="text-align: right;"><%=expertConsult.USER_NAME%>  <%=expertConsult.EXPERT_CONSULT_REPLY_TIME%></h5>
+						</div>
+					</div>
+				</li>
+				<%}%>
+		</ul>
+
+		<div class="title">
+			<span>学员交流</span>
+			<span class="more stu_topic">更多</span>
+		</div>
+		<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed">
+			<% for(var m=0;m<stuTopics.length;m++){
+			   		var stu = stuTopics[m];
+				%>
+				<li class="mui-table-view-cell stu_item" topic_id="<%=stu.STU_TOPIC_ID%>">
+					<div class="mui-table">
+						<div class="mui-table-cell mui-col-xs-12">
+							<p class="mui-h4 mui-ellipsis-2">
+								<%=stu.STU_TOPIC_TITLE%>
+							</p>
+							<h5 style="text-align: right;"><%=stu.STUDENT_NAME%>  <span class="mui-icon mui-icon-chatboxes" style="font-size: 14px;"><%=stu.STU_TOPIC_REPLY_CNT%></span</h5>
+						</div>
+					</div>
+				</li>
+				<%}%>
+		</ul>
+	</script>
+	<script>
+		mui.init({
+				swipeBack: true //启用右滑关闭功能
+			});
+			baidu.template.ESCAPE = false
+			mui.plusReady(function() { 
+					
+				mui.getJSON(api_url+"/api/mobile/communcation/index", null, function(data) {
+					var html = baidu.template('tmpl', data);
+					document.getElementById("content").innerHTML = html;
+					plus.nativeUI.closeWaiting(); 
+				});
+				
+				
+				mui("body").on("tap",".stu_item",function(){ 
+					var topic_id = this.getAttribute("topic_id");
+					mui.openWindow({
+						url: "StuTopic/view.html",
+						id: "stu_topic_view",
+						styles: {
+							top: 0,
+							bottom: 0
+						},
+						extras: {
+							topic_id:topic_id
+						},
+						createNew: false,
+						show: {
+							autoShow: true,
+							duration: 500
+						},
+						waiting: {
+							autoShow: true,
+							title: '正在加载...'
+						}
+					});
+				});
+				
+				
+				
+				mui("body").on("tap",".expert_consult",function(){
+					
+						mui.openWindow({
+						url: "Consult/index.html",
+						id: "consult_exprt_index",
+						styles: {
+							top: 0,
+							bottom: 0
+						},
+						extras: {
+						},
+						createNew: true,
+						show: {
+							autoShow: true,
+							duration: 400
+						},
+						waiting: {
+							autoShow: true,
+							title: '正在加载...'
+						}
+					});
+				});
+				
+				mui("body").on("tap",".stu_topic",function(){
+					
+						mui.openWindow({
+						url: "StuTopic/index.html",
+						id: "stu_index",
+						styles: {
+							top: 0,
+							bottom: 0
+						},
+						extras: {
+						},
+						createNew: true,
+						show: {
+							autoShow: true,
+							duration: 400
+						},
+						waiting: {
+							autoShow: true,
+							title: '正在加载...'
+						}
+					});
+				});
+			});
+	</script>
+
+</html>
